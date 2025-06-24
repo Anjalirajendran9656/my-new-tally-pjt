@@ -1,3 +1,28 @@
+<input type="text" id="userInput" placeholder="Ask something..." />
+<button onclick="sendToGPT()">Ask</button>
+
+<div id="responseBox"></div>
+
+<script>
+  async function sendToGPT() {
+    const input = document.getElementById("userInput").value;
+
+    const res = await fetch("https://your-n8n-domain.com/webhook/askgpt", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ message: input })
+    });
+
+    const data = await res.text();
+    document.getElementById("responseBox").innerText = data;
+  }
+</script>
+
+
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>

@@ -22,7 +22,6 @@
 
 
 
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -151,7 +150,7 @@
             display: none;
             background: rgba(255, 255, 255, 0.95);
             border-radius: 10px;
-            margin-top: 10px;
+            margin-bottom: 20px;
             max-height: 200px;
             overflow-y: auto;
             box-shadow: 0 5px 15px rgba(0,0,0,0.3);
@@ -171,6 +170,59 @@
 
         .suggestion-item:last-child {
             border-bottom: none;
+        }
+
+        .answer-display {
+            margin-top: 20px;
+        }
+
+        .answer-label {
+            display: block;
+            margin-bottom: 10px;
+            color: #ffeb3b;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .answer-textarea {
+            width: 100%;
+            min-height: 200px;
+            padding: 20px;
+            font-size: 14px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            background: rgba(0, 0, 0, 0.3);
+            color: white;
+            resize: vertical;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+        }
+
+        .answer-textarea:focus {
+            outline: none;
+            border-color: #ffeb3b;
+            box-shadow: 0 0 10px rgba(255, 235, 59, 0.3);
+        }
+
+        .answer-textarea::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .clear-btn {
+            margin-top: 10px;
+            padding: 8px 16px;
+            background: linear-gradient(45deg, #f44336, #d32f2f);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .clear-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(244, 67, 54, 0.4);
         }
 
         .faq-section {
@@ -234,7 +286,7 @@
             }
             to {
                 opacity: 1;
-                max-height: 200px;
+                max-height: 500px;
             }
         }
 
@@ -273,6 +325,24 @@
             transform: rotate(180deg);
         }
 
+        .copy-answer-btn {
+            margin-top: 10px;
+            padding: 8px 16px;
+            background: linear-gradient(45deg, #2196F3, #1976D2);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            margin-right: 10px;
+        }
+
+        .copy-answer-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(33, 150, 243, 0.4);
+        }
+
         @media (max-width: 768px) {
             .main-heading {
                 flex-direction: column;
@@ -302,6 +372,18 @@
         <div class="search-section">
             <input type="text" class="search-input" id="searchInput" placeholder="Type your Python question here... (e.g., 'how to create a list')">
             <div class="suggestions" id="suggestions"></div>
+            
+            <div class="answer-display">
+                <label class="answer-label" for="answerTextarea">📝 Answer:</label>
+                <textarea 
+                    id="answerTextarea" 
+                    class="answer-textarea" 
+                    placeholder="Your answer will appear here when you select a question or click on FAQ items..."
+                    readonly
+                ></textarea>
+                <button class="copy-answer-btn" onclick="copyAnswer()">📋 Copy Answer</button>
+                <button class="clear-btn" onclick="clearAnswer()">🗑️ Clear</button>
+            </div>
         </div>
 
         <div class="faq-section">
@@ -470,124 +552,291 @@ except Exception as e:
     </div>
 
     <script>
-        // Sample questions for suggestions
-        const commonQuestions = [
-            "How to create a list in Python?",
-            "How to write a for loop?",
-            "How to define a function?",
-            "How to handle exceptions?",
-            "How to read a file in Python?",
-            "How to install packages with pip?",
-            "What is the difference between list and tuple?",
-            "How to use dictionaries?",
-            "How to import modules?",
-            "How to work with strings?",
-            "How to create a class?",
-            "How to use lambda functions?",
-            "How to work with JSON?",
-            "How to connect to a database?",
-            "How to make HTTP requests?",
-            "How to work with dates and time?",
-            "How to use regular expressions?",
-            "How to create a GUI application?",
-            "How to work with CSV files?",
-            "How to debug Python code?"
-        ];
+        // Sample questions for suggestions with corresponding answers
+        const faqDatabase = {
+            "How to create a list in Python?": `Creating Lists in Python:
 
-        const searchInput = document.getElementById('searchInput');
-        const suggestionsDiv = document.getElementById('suggestions');
+Lists are ordered collections that can store multiple items. They're mutable (changeable).
 
-        searchInput.addEventListener('input', function() {
-            const query = this.value.toLowerCase().trim();
-            
-            if (query.length < 2) {
-                suggestionsDiv.style.display = 'none';
-                return;
-            }
+Basic Syntax:
+# Creating lists
+fruits = ["apple", "banana", "orange"]
+numbers = [1, 2, 3, 4, 5]
+mixed_list = [1, "hello", 3.14, True]
 
-            const matches = commonQuestions.filter(question => 
-                question.toLowerCase().includes(query)
-            );
+# Empty list
+empty_list = []
+# or
+empty_list = list()
 
-            if (matches.length > 0) {
-                suggestionsDiv.innerHTML = matches
-                    .slice(0, 5) // Show max 5 suggestions
-                    .map(question => `<div class="suggestion-item" onclick="selectSuggestion('${question}')">${question}</div>`)
-                    .join('');
-                suggestionsDiv.style.display = 'block';
-            } else {
-                suggestionsDiv.style.display = 'none';
-            }
-        });
+Common Operations:
+# Accessing items
+print(fruits[0])  # Output: apple
+print(fruits[-1])  # Output: orange (last item)
 
-        // Hide suggestions when clicking outside
-        document.addEventListener('click', function(e) {
-            if (!searchInput.contains(e.target) && !suggestionsDiv.contains(e.target)) {
-                suggestionsDiv.style.display = 'none';
-            }
-        });
+# Adding items
+fruits.append("grape")  # Add to end
+fruits.insert(1, "mango")  # Insert at index 1
 
-        function selectSuggestion(question) {
-            searchInput.value = question;
-            suggestionsDiv.style.display = 'none';
-            
-            // You can add logic here to show relevant FAQ items
-            highlightRelevantFAQ(question);
-        }
+# Removing items
+fruits.remove("banana")  # Remove by value
+del fruits[0]  # Remove by index
+last_item = fruits.pop()  # Remove and return last item
 
-        function highlightRelevantFAQ(question) {
-            // Simple keyword matching to highlight relevant FAQ sections
-            const keywords = question.toLowerCase();
-            const faqItems = document.querySelectorAll('.faq-item');
-            
-            faqItems.forEach(item => {
-                const questionText = item.querySelector('.faq-question').textContent.toLowerCase();
-                if (keywords.includes('list') && questionText.includes('list') ||
-                    keywords.includes('loop') && questionText.includes('loop') ||
-                    keywords.includes('function') && questionText.includes('function') ||
-                    keywords.includes('error') && questionText.includes('error')) {
-                    
-                    item.style.border = '2px solid #ffeb3b';
-                    item.style.background = 'rgba(255, 235, 59, 0.1)';
-                    
-                    // Reset highlight after 3 seconds
-                    setTimeout(() => {
-                        item.style.border = '1px solid rgba(255, 255, 255, 0.1)';
-                        item.style.background = 'rgba(255, 255, 255, 0.08)';
-                    }, 3000);
-                }
-            });
-        }
+# Length of list
+print(len(fruits))
 
-        function toggleAnswer(element) {
-            const answer = element.nextElementSibling;
-            const icon = element.querySelector('.expand-icon');
-            
-            if (answer.classList.contains('active')) {
-                answer.classList.remove('active');
-                icon.classList.remove('rotated');
-            } else {
-                // Close all other answers
-                document.querySelectorAll('.faq-answer.active').forEach(activeAnswer => {
-                    activeAnswer.classList.remove('active');
-                    activeAnswer.previousElementSibling.querySelector('.expand-icon').classList.remove('rotated');
-                });
-                
-                // Open clicked answer
-                answer.classList.add('active');
-                icon.classList.add('rotated');
-            }
-        }
+# Check if item exists
+if "apple" in fruits:
+    print("Apple is in the list")`,
 
-        // Add some interactive features
-        document.addEventListener('DOMContentLoaded', function() {
-            // Add welcome message
-            setTimeout(() => {
-                if (searchInput.value === '') {
-                    searchInput.placeholder = "Welcome! Try typing 'how to create a list' or 'for loop'...";
-                }
-            }, 3000);
-        });
-    </script>
-</body>
-</html>
+            "How to write a for loop?": `For Loops in Python:
+
+For loops are used to iterate over sequences (lists, tuples, strings, etc.).
+
+Basic Syntax:
+# Loop through a list
+fruits = ["apple", "banana", "orange"]
+for fruit in fruits:
+    print(f"I like {fruit}")
+
+# Loop through a string
+for letter in "Python":
+    print(letter)
+
+# Loop with range
+for i in range(5):  # 0 to 4
+    print(f"Number: {i}")
+
+# Loop with range (start, stop, step)
+for i in range(1, 10, 2):  # 1, 3, 5, 7, 9
+    print(i)
+
+Advanced Examples:
+# Loop with index
+fruits = ["apple", "banana", "orange"]
+for index, fruit in enumerate(fruits):
+    print(f"{index}: {fruit}")
+
+# Loop through dictionary
+person = {"name": "Alice", "age": 25}
+for key, value in person.items():
+    print(f"{key}: {value}")
+
+# List comprehension (advanced)
+squares = [x**2 for x in range(10)]
+print(squares)  # [0, 1, 4, 9, 16, 25, 36, 49, 64, 81]`,
+
+            "How to define a function?": `Defining Functions in Python:
+
+Functions are reusable blocks of code that perform specific tasks.
+
+Basic Syntax:
+def function_name(parameters):
+    """Optional docstring"""
+    # Function body
+    return value  # Optional
+
+Simple Examples:
+# Function without parameters
+def greet():
+    print("Hello, World!")
+
+greet()  # Call the function
+
+# Function with parameters
+def greet_person(name):
+    print(f"Hello, {name}!")
+
+greet_person("Alice")
+
+# Function with return value
+def add_numbers(a, b):
+    result = a + b
+    return result
+
+sum_result = add_numbers(5, 3)
+print(sum_result)  # Output: 8
+
+Advanced Examples:
+# Function with default parameters
+def greet_with_title(name, title="Mr./Ms."):
+    return f"Hello, {title} {name}!"
+
+print(greet_with_title("Smith"))  # Uses default title
+print(greet_with_title("Smith", "Dr."))  # Uses custom title
+
+# Function with multiple return values
+def get_name_age():
+    return "Alice", 25
+
+name, age = get_name_age()
+print(f"Name: {name}, Age: {age}")
+
+# Function with *args and **kwargs
+def flexible_function(*args, **kwargs):
+    print("Args:", args)
+    print("Kwargs:", kwargs)
+
+flexible_function(1, 2, 3, name="Alice", age=25)`,
+
+            "How to handle exceptions?": `Exception Handling in Python:
+
+Use try-except blocks to handle errors gracefully and prevent crashes.
+
+Basic Syntax:
+try:
+    # Code that might raise an exception
+    risky_code()
+except ExceptionType:
+    # Handle the exception
+    handle_error()
+
+Common Examples:
+# Handle division by zero
+try:
+    number = int(input("Enter a number: "))
+    result = 10 / number
+    print(f"Result: {result}")
+except ZeroDivisionError:
+    print("Error: Cannot divide by zero!")
+except ValueError:
+    print("Error: Please enter a valid number!")
+
+# Multiple exceptions
+try:
+    file = open("data.txt", "r")
+    data = file.read()
+    number = int(data)
+except FileNotFoundError:
+    print("Error: File not found!")
+except ValueError:
+    print("Error: File contains invalid data!")
+except Exception as e:
+    print(f"Unexpected error: {e}")
+finally:
+    # This runs regardless of exceptions
+    if 'file' in locals():
+        file.close()
+
+Advanced Usage:
+# Raising custom exceptions
+def validate_age(age):
+    if age < 0:
+        raise ValueError("Age cannot be negative")
+    if age > 150:
+        raise ValueError("Age seems unrealistic")
+    return True
+
+try:
+    validate_age(-5)
+except ValueError as e:
+    print(f"Validation error: {e}")
+
+# Using else clause
+try:
+    result = 10 / 2
+except ZeroDivisionError:
+    print("Cannot divide by zero")
+else:
+    print(f"Division successful: {result}")  # Runs if no exception`,
+
+            "How to work with dictionaries?": `Working with Dictionaries in Python:
+
+Dictionaries store key-value pairs and are mutable collections.
+
+Creating Dictionaries:
+# Empty dictionary
+empty_dict = {}
+# or
+empty_dict = dict()
+
+# Dictionary with initial values
+person = {
+    "name": "Alice",
+    "age": 25,
+    "city": "New York"
+}
+
+# Using dict() constructor
+person2 = dict(name="Bob", age=30, city="Boston")
+
+Basic Operations:
+# Accessing values
+print(person["name"])  # Output: Alice
+print(person.get("age"))  # Output: 25
+print(person.get("phone", "Not available"))  # Default value
+
+# Adding/updating values
+person["email"] = "alice@email.com"  # Add new key
+person["age"] = 26  # Update existing key
+
+# Removing items
+del person["city"]  # Remove key-value pair
+phone = person.pop("phone", "Not found")  # Remove and return value
+
+# Check if key exists
+if "name" in person:
+    print("Name exists in dictionary")
+
+Common Methods:
+# Get all keys, values, or items
+print(person.keys())    # dict_keys(['name', 'age', 'email'])
+print(person.values())  # dict_values(['Alice', 26, 'alice@email.com'])
+print(person.items())   # dict_items([('name', 'Alice'), ('age', 26), ('email', 'alice@email.com')])
+
+# Loop through dictionary
+for key in person:
+    print(f"{key}: {person[key]}")
+
+# Or
+for key, value in person.items():
+    print(f"{key}: {value}")
+
+# Dictionary comprehension
+squares = {x: x**2 for x in range(5)}
+print(squares)  # {0: 0, 1: 1, 2: 4, 3: 9, 4: 16}`,
+
+            "How to read a file in Python?": `Reading Files in Python:
+
+Python provides several ways to read files safely and efficiently.
+
+Basic File Reading:
+# Method 1: Using with statement (recommended)
+with open("filename.txt", "r") as file:
+    content = file.read()
+    print(content)
+# File is automatically closed after the with block
+
+# Method 2: Manual file handling
+file = open("filename.txt", "r")
+content = file.read()
+print(content)
+file.close()  # Must close manually
+
+Reading Methods:
+# Read entire file
+with open("data.txt", "r") as file:
+    content = file.read()  # Reads entire file as string
+
+# Read line by line
+with open("data.txt", "r") as file:
+    for line in file:
+        print(line.strip())  # strip() removes newline characters
+
+# Read all lines into a list
+with open("data.txt", "r") as file:
+    lines = file.readlines()
+    print(lines)
+
+# Read one line at a time
+with open("data.txt", "r") as file:
+    first_line = file.readline()
+    second_line = file.readline()
+
+Error Handling:
+try:
+    with open("data.txt", "r") as file:
+        content = file.read()
+        print(content)
+except File
